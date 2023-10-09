@@ -86,3 +86,32 @@ ggplot(aes(x = year, y = data_value)) +
   ) 
 ```
 
+# problem 3
+```{r}
+covar_df =
+  read_csv("nhanes_covar.csv") |>
+  janitor::clean_names() |>
+  filter(age >= 21) |>
+   mutate(                                  
+    sex = replace(sex, sex == 2, "Female"),
+    sex = replace(sex, sex == 1, "Male"),
+    education = replace(education, education == 1, "Less than high school"),
+    education = replace(education, education == 2, "High school equivalent"),
+    education = replace(education, education == 3, "More than high school")
+   ) |>
+  mutate(sex = as.factor(sex),
+         education = as.factor(education)
+  )
+```
+
+```{r}
+accel_df =
+  read_csv("nhanes_accel.csv") |>
+  janitor::clean_names()
+```
+
+```{r}
+combine_df =
+  inner_join(covar_df, accel_df, by = "seqn")
+```
+
