@@ -17,6 +17,7 @@ brfss_df =
   brfss_smart2010 |>
   janitor::clean_names() |>
   filter(topic == "Overall Health") |>
+  separate(locationdesc, into = c("state", "county"), sep = " - ") |>
   filter(response == "Excellent" | response == "Very good" | response == "Good" | 
          response == "Fair" | response == "Poor") |>
   mutate(response = as.factor(response),
@@ -24,4 +25,25 @@ brfss_df =
 ```
 
 ## question 1
+In 2002, which states were observed at 7 or more locations? What about in 2010?
+```{r}
+prob1_q1_02 = filter(brfss_df, year == 2002) |>
+  group_by(state) |>
+  summarize(n_obs = n_distinct(county)) |>
+  filter(n_obs >= 7) 
 
+state_2002 = pull(prob1_q1_02, state)
+```
+In 2002, following states `r state_2002` were observed at 7 or more location
+
+```{r}
+prob1_q1_10 = filter(brfss_df, year == 2010) |>
+  group_by(state) |>
+  summarize(n_obs = n_distinct(county)) |>
+  filter(n_obs >= 7) 
+
+state_2010 = pull(prob1_q1_10, state)
+```
+In 2002, following states `r state_2010` were observed at 7 or more location
+
+### question 2
