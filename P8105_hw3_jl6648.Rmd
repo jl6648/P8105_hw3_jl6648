@@ -137,4 +137,39 @@ ggplot(agedistri_edu) +
   )
 ```
 
+### Plot these total activities (y-axis) against age (x-axis)
+```{r}
+accel_clean = 
+  combine_df |>
+  pivot_longer(
+    min1:min1440,
+    names_to = "number",
+    values_to = "counts",
+    names_prefix = "min"
+  )
+
+accel_clean |>
+ggplot(aes(x = age, y = counts)) +
+  geom_smooth(aes(color = sex)) +
+  facet_grid(. ~ education)
+  labs(
+    title = "total activities against age",
+    x = "age",
+    y = "total activities",
+  ) 
+```
+
+### Make a three-panel plot that shows the 24-hour activity time courses for each education level and use color to indicate sex.
+```{r}
+accel_clean |>
+ggplot(aes(x = number, y = counts)) +
+  geom_line(aes(color = sex)) +
+  facet_grid(. ~ education) +
+  labs(
+    title = "total activities over 24-hour",
+    x = "time(mins)",
+    y = "total activities",
+  ) 
+```
+
 
