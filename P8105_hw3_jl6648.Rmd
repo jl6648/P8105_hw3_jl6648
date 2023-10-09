@@ -8,6 +8,7 @@ date: "2023-10-09"
 # probelm 2 
 ```{r, message=FALSE}
 library(tidyverse)
+library(dplyr)
 library(p8105.datasets)                                                                  # load the data
 data("brfss_smart2010") 
 ```
@@ -44,6 +45,25 @@ prob1_q1_10 = filter(brfss_df, year == 2010) |>
 
 state_2010 = pull(prob1_q1_10, state)
 ```
-In 2002, following states `r state_2010` were observed at 7 or more location
+In 2010, following states `r state_2010` were observed at 7 or more location
 
 ### question 2
+```{r}
+brfss_excellent =
+brfss_df |>
+  filter(response == "Excellent") |>
+  select(year, state, county, response, data_value) |>
+  group_by(year, state)
+
+brfss_excellent |>
+ggplot(aes(x = year, y = data_value)) +
+  geom_line(aes(color = state)) +
+  labs(
+    title = "average value over time within a state",
+    x = "Year",
+    y = "average value",
+    caption = "Data from the p8105.datasets package"
+  ) 
+```
+
+### 
