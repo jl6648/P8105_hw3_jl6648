@@ -48,22 +48,23 @@ state_2010 = pull(prob1_q1_10, state)
 In 2010, following states `r state_2010` were observed at 7 or more location
 
 ## question 2
-```{r}
+```{r, message=FALSE}
 brfss_excellent =
 brfss_df |>
   filter(response == "Excellent") |>
-  select(year, state, county, response, data_value) |>
-  group_by(year, state)
+  group_by(year, state) |>
+  summarise(avg_data = mean(data_value, na.rm = T))
 
 brfss_excellent |>
-ggplot(aes(x = year, y = data_value)) +
-  geom_line(aes(color = state)) +
+ggplot(aes(x = year, y = avg_data, color = state)) +
+  geom_line() +
   labs(
     title = "average value over time within a state",
     x = "Year",
     y = "average value",
     caption = "Data from the p8105.datasets package"
-  ) 
+  ) +
+  theme_minimal()
 ```
 
 ## question 3
@@ -77,7 +78,8 @@ brfss_NY =
 
 brfss_NY |>
 ggplot(aes(x = year, y = data_value)) +
-  geom_line(aes(color = county)) +
+  geom_boxplot() +  
+  facet_wrap(~ year, ncol = 2) +
   labs(
     title = "average value among locations in NY states in 2006 and 2010",
     x = "Year",
@@ -89,7 +91,7 @@ ggplot(aes(x = year, y = data_value)) +
 # problem 3
 ```{r}
 covar_df =
-  read_csv("nhanes_covar.csv") |>
+  read_csv("nhanes_covar.csv", skip=4) |>
   janitor::clean_names() |>
   filter(age >= 21) |>
    mutate(                                  
@@ -101,7 +103,8 @@ covar_df =
    ) |>
   mutate(sex = as.factor(sex),
          education = as.factor(education)
-  )
+  ) |>
+  na.omit()
 ```
 
 ```{r}
@@ -128,13 +131,15 @@ table(sex_education_table)
 agedistri_edu =
   select(combine_df, sex | education | age) 
 
-ggplot(agedistri_edu) +
-  geom_boxplot(aes(x = education, y = age, color = sex)) +
+agedistri_edu |>
+ggplot(aes(x = education, y = age, color = sex)) +
+  geom_boxplot() +
   labs(
     title = "age distributions for men and women in each education category",
     x = "category of education",
     y = "age",
-  )
+  ) +
+  theme_minimal()
 ```
 
 ### Plot these total activities (y-axis) against age (x-axis)
@@ -144,13 +149,16 @@ accel_clean =
   pivot_longer(
     min1:min1440,
     names_to = "number",
-    values_to = "counts",
-    names_prefix = "min"
+    values_to = "counts"
+  ) |>
+  group_by(seqn, sex, age, education) |>
+  summarize(
+    total_activity = sum(counts)
   )
 
 accel_clean |>
-ggplot(aes(x = age, y = counts)) +
-  geom_smooth(aes(color = sex)) +
+ggplot(aes(x = age, y = total_activity, color = sex)) +
+  geom_smooth() +
   facet_grid(. ~ education)
   labs(
     title = "total activities against age",
@@ -161,9 +169,18 @@ ggplot(aes(x = age, y = counts)) +
 
 ### Make a three-panel plot that shows the 24-hour activity time courses for each education level and use color to indicate sex.
 ```{r}
-accel_clean |>
-ggplot(aes(x = number, y = counts)) +
-  geom_line(aes(color = sex)) +
+accel_day =
+  combine_df |>
+  pivot_longer(
+    min1:min1440,
+    names_to = "number",
+    values_to = "counts",
+    names_prefix = "min"
+  )
+
+accel_day |>
+ggplot(aes(x = number, y = counts, color = sex)) +
+  geom_line() +
   facet_grid(. ~ education) +
   labs(
     title = "total activities over 24-hour",
