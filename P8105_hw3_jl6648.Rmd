@@ -57,7 +57,7 @@ brfss_df |>
 
 brfss_excellent |>
 ggplot(aes(x = year, y = avg_data, color = state)) +
-  geom_line() +
+  geom_path() +
   labs(
     title = "average value over time within a state",
     x = "Year",
@@ -77,7 +77,7 @@ brfss_NY =
   group_by(year, state)
 
 brfss_NY |>
-ggplot(aes(x = year, y = data_value)) +
+ggplot(aes(x = response, y = data_value)) +
   geom_boxplot() +  
   facet_wrap(~ year, ncol = 2) +
   labs(
@@ -110,34 +110,38 @@ covar_df =
 ```{r}
 accel_df =
   read_csv("nhanes_accel.csv") |>
-  janitor::clean_names()
+  janitor::clean_names() |>
+  pivot_longer(
+    min1:min1440,
+    names_to = "number",
+    values_to = "counts",
+    names_prefix = "min"
+  )
 ```
 
 ```{r}
 combine_df =
-  inner_join(covar_df, accel_df, by = "seqn")
+  left_join(covar_df, accel_df, by = "seqn")
 ```
 
 ### Produce a reader-friendly table for the number of men and women in each education category
 ```{r}
 sex_education_table =
-  select(combine_df, sex | education) 
+  select(covar_df, sex | education) 
   
 table(sex_education_table)
 ```
 
 ### create a visualization of the age distributions for men and women in each education category
 ```{r}
-agedistri_edu =
-  select(combine_df, sex | education | age) 
-
-agedistri_edu |>
-ggplot(aes(x = education, y = age, color = sex)) +
-  geom_boxplot() +
+covar_df |>
+ggplot(aes(x = age, fill = sex )) +
+  geom_density(alpha = .5) +
+  facet_grid(. ~ education)
   labs(
     title = "age distributions for men and women in each education category",
-    x = "category of education",
-    y = "age",
+    x = "age",
+    y = "density",
   ) +
   theme_minimal()
 ```
@@ -146,11 +150,6 @@ ggplot(aes(x = education, y = age, color = sex)) +
 ```{r}
 accel_clean = 
   combine_df |>
-  pivot_longer(
-    min1:min1440,
-    names_to = "number",
-    values_to = "counts"
-  ) |>
   group_by(seqn, sex, age, education) |>
   summarize(
     total_activity = sum(counts)
@@ -158,7 +157,8 @@ accel_clean =
 
 accel_clean |>
 ggplot(aes(x = age, y = total_activity, color = sex)) +
-  geom_smooth() +
+  geom_point() +
+  geom_smooth(se = FALSE) +
   facet_grid(. ~ education)
   labs(
     title = "total activities against age",
@@ -169,19 +169,11 @@ ggplot(aes(x = age, y = total_activity, color = sex)) +
 
 ### Make a three-panel plot that shows the 24-hour activity time courses for each education level and use color to indicate sex.
 ```{r}
-accel_day =
-  combine_df |>
-  pivot_longer(
-    min1:min1440,
-    names_to = "number",
-    values_to = "counts",
-    names_prefix = "min"
-  )
-
-accel_day |>
-ggplot(aes(x = number, y = counts, color = sex)) +
-  geom_line() +
+combine_df |>
+ggplot(aes(x = number, y = counts, group = seqn, color = sex)) +
+  geom_line(alpha = .2) +
   facet_grid(. ~ education) +
+  geom_smooth(aes(group = sex), se = FALSE)
   labs(
     title = "total activities over 24-hour",
     x = "time(mins)",
