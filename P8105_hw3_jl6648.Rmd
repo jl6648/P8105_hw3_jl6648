@@ -248,6 +248,7 @@ at high school equivalent and more than high school education level, overall fem
 # plot a graph to show the relationship between 24-hour activity time courses for each participants. group people by sex and education level as well. use lab to lable the graph
 
 combine_df |>
+  mutate(number = as.numeric(number)) |>
 ggplot(aes(x = number, y = counts, group = seqn, color = sex)) +
   geom_line(alpha = .2) +
   facet_grid(. ~ education) +
@@ -258,4 +259,4 @@ ggplot(aes(x = number, y = counts, group = seqn, color = sex)) +
     y = "total activities",
   ) 
 ```
-No matter gender and education level, the pattern of 24 hour activity is similar. at high school equivalent and less than high school education level, 24 hour activity of male is higher than female; at more than high school education level, 24 hour activity of female is higher than male. 
+No matter gender and education level, the pattern of 24 hour activity is similar, people have low activity during the midnight and high activity during the day.  at high school equivalent and less than high school education level, 24 hour activity of male is higher than female; at more than high school education level, 24 hour activity of female is higher than male. 
