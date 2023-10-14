@@ -135,6 +135,8 @@ ggplot(aes(x = year, y = avg_data, color = state)) +
   theme_minimal()                                                     # make the background looks clear
 ```
 
+average value varies depending on states. The average value of each states fluctuate from 2002 to 2010. There is a sharp increase for many states in 2003, 2006 and 2008. Most of states have similar pattern, however, WV has a sharp decrease in 2005 and 2007, which is different with other states. 
+
 ## question 3
 ```{r}
 brfss_NY =
@@ -156,6 +158,8 @@ ggplot(aes(x = response, y = data_value)) +
     caption = "Data from the p8105.datasets package"
   ) 
 ```
+
+In 2006, county with Very good and Good reponse have similar range of average value following with Excellent and Fair reponse, Poor response has the lowest value. In 2010, very good response has highest average value, and is followed by Good, Excellent and Fair response, similar with year 2006, Poor has the lowest value. The overall average value pattern didn't change a lot from 2006 to 2010. 
 
 # problem 3
 ```{r, message=FALSE}
