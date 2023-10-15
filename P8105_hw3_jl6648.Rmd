@@ -88,7 +88,7 @@ brfss_df =
   filter(response == "Excellent" | response == "Very good" | response == "Good" | 
          response == "Fair" | response == "Poor") |>                       #select interested response
   mutate(response = as.factor(response),            #organize responses as a factor taking levels order
-         response = ordered(response, levels = c("Excellent", "Very good", "Good", "Fair", "Poor"))) 
+         response = ordered(response, levels = c("Poor", "Fair", "Good", "Very good", "Excellent"))) 
 ```
 
 ## question 1
@@ -135,7 +135,7 @@ ggplot(aes(x = year, y = avg_data, color = state)) +
   theme_minimal()                                                     # make the background looks clear
 ```
 
-average value varies depending on states. The average value of each states fluctuate from 2002 to 2010. There is a sharp increase for many states in 2003, 2006 and 2008. Most of states have similar pattern, however, WV has a sharp decrease in 2005 and 2007, which is different with other states. 
+average value varies depending on states. The average value of each states fluctuate from 2002 to 2010. There is a sharp increase for many states in 2003, 2006 and 2008. Most of states have similar pattern, however, WV has a sharp decrease in 2005 and 2009, which is different with other states. 
 
 ## question 3
 ```{r}
